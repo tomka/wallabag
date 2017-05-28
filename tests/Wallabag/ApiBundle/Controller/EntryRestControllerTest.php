@@ -686,7 +686,7 @@ class EntryRestControllerTest extends WallabagApiTestCase
 
     public function testGetEntriesExists()
     {
-        $this->client->request('GET', '/api/entries/exists?url=http://0.0.0.0/entry2');
+        $this->client->request('GET', '/api/entries/exists?hashedurl=' . hash('sha512', 'http://0.0.0.0/entry2'));
 
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
 
@@ -699,21 +699,21 @@ class EntryRestControllerTest extends WallabagApiTestCase
     {
         $url1 = 'http://0.0.0.0/entry2';
         $url2 = 'http://0.0.0.0/entry10';
-        $this->client->request('GET', '/api/entries/exists?urls[]='.$url1.'&urls[]='.$url2);
+        $this->client->request('GET', '/api/entries/exists?hashedurls[]='.hash('sha512',$url1).'&hashedurls[]='.hash('sha512',$url2));
 
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         $content = json_decode($this->client->getResponse()->getContent(), true);
 
-        $this->assertArrayHasKey($url1, $content);
-        $this->assertArrayHasKey($url2, $content);
-        $this->assertEquals(2, $content[$url1]);
-        $this->assertEquals(false, $content[$url2]);
+        $this->assertArrayHasKey(hash('sha512', $url1), $content);
+        $this->assertArrayHasKey(hash('sha512', $url2), $content);
+        $this->assertEquals(2, $content[hash('sha512', $url1)]);
+        $this->assertEquals(false, $content[hash('sha512', $url2)]);
     }
 
     public function testGetEntriesExistsWhichDoesNotExists()
     {
-        $this->client->request('GET', '/api/entries/exists?url=http://google.com/entry2');
+        $this->client->request('GET', '/api/entries/exists?hashedurl='.hash('sha512','http://google.com/entry2'));
 
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
 
@@ -724,7 +724,7 @@ class EntryRestControllerTest extends WallabagApiTestCase
 
     public function testGetEntriesExistsWithNoUrl()
     {
-        $this->client->request('GET', '/api/entries/exists?url=');
+        $this->client->request('GET', '/api/entries/exists?hashedurl=');
 
         $this->assertEquals(403, $this->client->getResponse()->getStatusCode());
     }

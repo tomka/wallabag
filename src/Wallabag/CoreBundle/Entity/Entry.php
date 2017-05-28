@@ -24,7 +24,8 @@ use Wallabag\AnnotationBundle\Entity\Annotation;
  *     options={"collate"="utf8mb4_unicode_ci", "charset"="utf8mb4"},
  *     indexes={
  *         @ORM\Index(name="created_at", columns={"created_at"}),
- *         @ORM\Index(name="uid", columns={"uid"})
+ *         @ORM\Index(name="uid", columns={"uid"}),
+ *         @ORM\Index(name="hashedurl", columns={"hashedurl"})
  *     }
  * )
  * @ORM\HasLifecycleCallbacks()
@@ -71,6 +72,13 @@ class Entry
      * @Groups({"entries_for_user", "export_all"})
      */
     private $url;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="hashedurl", type="text", nullable=true)
+     */
+    private $hashedUrl;
 
     /**
      * @var bool
@@ -760,6 +768,26 @@ class Entry
     public function setHeaders($headers)
     {
         $this->headers = $headers;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHashedUrl()
+    {
+        return $this->hashedUrl;
+    }
+
+    /**
+     * @param mixed $hashedUrl
+     *
+     * @return Entry
+     */
+    public function setHashedUrl($hashedUrl)
+    {
+        $this->hashedUrl = $hashedUrl;
 
         return $this;
     }

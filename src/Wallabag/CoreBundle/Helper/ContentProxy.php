@@ -75,6 +75,7 @@ class ContentProxy
         }
 
         $entry->setUrl($content['url'] ?: $url);
+        $entry->setHashedUrl(hash('sha512', $entry->getUrl()));
         $entry->setTitle($title);
         $entry->setContent($html);
         $entry->setHttpStatus(isset($content['status']) ? $content['status'] : '');

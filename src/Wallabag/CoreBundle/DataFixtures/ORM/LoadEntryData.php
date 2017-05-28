@@ -32,6 +32,7 @@ class LoadEntryData extends AbstractFixture implements OrderedFixtureInterface
 
         $entry2 = new Entry($this->getReference('admin-user'));
         $entry2->setUrl('http://0.0.0.0/entry2');
+        $entry2->setHashedUrl(hash('sha512', 'http://0.0.0.0/entry2'));
         $entry2->setReadingTime(1);
         $entry2->setDomainName('domain.io');
         $entry2->setMimetype('text/html');
