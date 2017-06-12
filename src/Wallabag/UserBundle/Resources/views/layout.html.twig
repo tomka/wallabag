@@ -10,6 +10,9 @@
 {% block content %}
 <main class="valign-wrapper">
     <div class="valign row">
+        <a href="{{ path('changeLocale', {'language': 'de'}) }}">DE</a>
+        <a href="{{ path('changeLocale', {'language': 'en'}) }}">EN</a>
+        <a href="{{ path('changeLocale', {'language': 'fr'}) }}">FR</a>
         <div class="card sw">
             <div class="center"><img src="{{ asset('bundles/wallabagcore/themes/_global/img/logo-other_themes.png') }}" alt="wallabag logo" /></div>
             {% block fos_user_content %}

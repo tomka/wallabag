@@ -433,4 +433,23 @@ class ConfigController extends Controller
 
         return $this->redirect($request->headers->get('referer'));
     }
+
+    /**
+     * Change the locale for the current user.
+     *
+     * @param Request $request
+     * @param string  $language
+     *
+     * @Route("/locale/{language}", name="changeLocale")
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function setLocaleAction(Request $request, $language = null)
+    {
+        if ($language != null) {
+            $this->get('session')->set('_locale', $language);
+        }
+
+        return $this->redirect($request->headers->get('referer'));
+    }
 }
