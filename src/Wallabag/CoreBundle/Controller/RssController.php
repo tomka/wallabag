@@ -26,6 +26,7 @@ class RssController extends Controller
      *
      * @param User $user
      * @param $page
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showUnreadRSSAction(User $user, $page)
@@ -41,6 +42,7 @@ class RssController extends Controller
      *
      * @param User $user
      * @param $page
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showArchiveRSSAction(User $user, $page)
@@ -56,6 +58,7 @@ class RssController extends Controller
      *
      * @param User $user
      * @param $page
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showStarredRSSAction(User $user, $page)
