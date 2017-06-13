@@ -21,40 +21,46 @@ class RssController extends Controller
     /**
      * Shows unread entries for current user.
      *
-     * @Route("/{username}/{token}/unread.xml", name="unread_rss", defaults={"_format"="xml"})
+     * @Route("/feed/{username}/{token}/unread/{page}", name="unread_rss", defaults={"page": 1})
      * @ParamConverter("user", class="WallabagUserBundle:User", converter="username_rsstoken_converter")
      *
+     * @param User $user
+     * @param $page
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showUnreadRSSAction(Request $request, User $user)
+    public function showUnreadRSSAction(User $user, $page)
     {
-        return $this->showEntries('unread', $user, $request->query->get('page', 1));
+        return $this->showEntries('unread', $user, $page);
     }
 
     /**
      * Shows read entries for current user.
      *
-     * @Route("/{username}/{token}/archive.xml", name="archive_rss", defaults={"_format"="xml"})
+     * @Route("/feed/{username}/{token}/archive/{page}", name="archive_rss", defaults={"page": 1})
      * @ParamConverter("user", class="WallabagUserBundle:User", converter="username_rsstoken_converter")
      *
+     * @param User $user
+     * @param $page
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showArchiveRSSAction(Request $request, User $user)
+    public function showArchiveRSSAction(User $user, $page)
     {
-        return $this->showEntries('archive', $user, $request->query->get('page', 1));
+        return $this->showEntries('archive', $user, $page);
     }
 
     /**
      * Shows starred entries for current user.
      *
-     * @Route("/{username}/{token}/starred.xml", name="starred_rss", defaults={"_format"="xml"})
+     * @Route("/feed/{username}/{token}/starred/{page}", name="starred_rss", defaults={"page": 1})
      * @ParamConverter("user", class="WallabagUserBundle:User", converter="username_rsstoken_converter")
      *
+     * @param User $user
+     * @param $page
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showStarredRSSAction(Request $request, User $user)
+    public function showStarredRSSAction(User $user, $page)
     {
-        return $this->showEntries('starred', $user, $request->query->get('page', 1));
+        return $this->showEntries('starred', $user, $page);
     }
 
     /**
@@ -179,19 +185,17 @@ class RssController extends Controller
             $entries->setCurrentPage((int) $page);
         } catch (OutOfRangeCurrentPageException $e) {
             if ($page > 1) {
-                return $this->redirect($url . '?page=' . $entries->getNbPages(), 302);
+                return $this->redirect($url.'/'.$entries->getNbPages());
             }
         }
 
-        return $this->render(
-            '@WallabagCore/themes/common/Entry/entries.xml.twig',
-            [
-                'url_html' => $this->generateUrl($type, [], UrlGeneratorInterface::ABSOLUTE_URL),
-                'type' => $type,
-                'url' => $url,
-                'entries' => $entries,
-            ],
-            new Response('', 200, ['Content-Type' => 'application/rss+xml'])
-        );
+        return $this->render('@WallabagCore/themes/common/Entry/entries.xml.twig', [
+            'type' => $type,
+            'url' => $url,
+            'entries' => $entries,
+            'user' => $user->getUsername(),
+            'domainName' => $this->getParameter('domain_name'),
+            'version' => $this->getParameter('wallabag_core.version'),
+        ]);
     }
 }
