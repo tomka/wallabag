@@ -4,9 +4,9 @@ namespace Tests\Wallabag\CoreBundle\Controller;
 
 use Tests\Wallabag\CoreBundle\WallabagCoreTestCase;
 
-class RssControllerTest extends WallabagCoreTestCase
+class FeedControllerTest extends WallabagCoreTestCase
 {
-    public function validateDom($xml, $type, $urlPagination, $nb = null)
+    public function validateDom($xml, $type, $nb = null, $tagValue = null)
     {
         $doc = new \DOMDocument();
         $doc->loadXML($xml);
@@ -23,7 +23,6 @@ class RssControllerTest extends WallabagCoreTestCase
         $this->assertEquals(1, $xpath->query('/a:feed')->length);
 
         $this->assertEquals(1, $xpath->query('/a:feed/a:title')->length);
-        $this->assertEquals('wallabag — '.$type.' feed', $xpath->query('/a:feed/a:title')->item(0)->nodeValue);
 
         $this->assertEquals(1, $xpath->query('/a:feed/a:updated')->length);
 
@@ -31,7 +30,13 @@ class RssControllerTest extends WallabagCoreTestCase
         $this->assertEquals('wallabag', $xpath->query('/a:feed/a:generator')->item(0)->nodeValue);
 
         $this->assertEquals(1, $xpath->query('/a:feed/a:subtitle')->length);
-        $this->assertEquals('RSS feed for '.$type.' entries', $xpath->query('/a:feed/a:subtitle')->item(0)->nodeValue);
+        if (null !== $tagValue && 0 === strpos($type, 'tag')) {
+            $this->assertEquals('wallabag — '.$type.' '.$tagValue.' feed', $xpath->query('/a:feed/a:title')->item(0)->nodeValue);
+            $this->assertEquals('Atom feed for entries tagged with ' . $tagValue, $xpath->query('/a:feed/a:subtitle')->item(0)->nodeValue);
+        } else {
+            $this->assertEquals('wallabag — '.$type.' feed', $xpath->query('/a:feed/a:title')->item(0)->nodeValue);
+            $this->assertEquals('Atom feed for ' . $type . ' entries', $xpath->query('/a:feed/a:subtitle')->item(0)->nodeValue);
+        }
 
         $this->assertEquals(1, $xpath->query('/a:feed/a:link[@rel="self"]')->length);
         $this->assertContains($type, $xpath->query('/a:feed/a:link[@rel="self"]')->item(0)->getAttribute('href'));
@@ -84,8 +89,8 @@ class RssControllerTest extends WallabagCoreTestCase
             ->findOneByUsername('admin');
 
         $config = $user->getConfig();
-        $config->setRssToken('SUPERTOKEN');
-        $config->setRssLimit(2);
+        $config->setFeedToken('SUPERTOKEN');
+        $config->setFeedLimit(2);
         $em->persist($config);
         $em->flush();
 
@@ -93,7 +98,7 @@ class RssControllerTest extends WallabagCoreTestCase
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
 
-        $this->validateDom($client->getResponse()->getContent(), 'unread', 'unread', 2);
+        $this->validateDom($client->getResponse()->getContent(), 'unread', 2);
     }
 
     public function testStarred()
@@ -105,8 +110,8 @@ class RssControllerTest extends WallabagCoreTestCase
             ->findOneByUsername('admin');
 
         $config = $user->getConfig();
-        $config->setRssToken('SUPERTOKEN');
-        $config->setRssLimit(1);
+        $config->setFeedToken('SUPERTOKEN');
+        $config->setFeedLimit(1);
         $em->persist($config);
         $em->flush();
 
@@ -115,7 +120,7 @@ class RssControllerTest extends WallabagCoreTestCase
 
         $this->assertSame(200, $client->getResponse()->getStatusCode(), 1);
 
-        $this->validateDom($client->getResponse()->getContent(), 'starred', 'starred');
+        $this->validateDom($client->getResponse()->getContent(), 'starred');
     }
 
     public function testArchives()
@@ -127,8 +132,8 @@ class RssControllerTest extends WallabagCoreTestCase
             ->findOneByUsername('admin');
 
         $config = $user->getConfig();
-        $config->setRssToken('SUPERTOKEN');
-        $config->setRssLimit(null);
+        $config->setFeedToken('SUPERTOKEN');
+        $config->setFeedLimit(null);
         $em->persist($config);
         $em->flush();
 
@@ -137,7 +142,7 @@ class RssControllerTest extends WallabagCoreTestCase
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
 
-        $this->validateDom($client->getResponse()->getContent(), 'archive', 'archive');
+        $this->validateDom($client->getResponse()->getContent(), 'archive');
     }
 
     public function testPagination()
@@ -149,8 +154,8 @@ class RssControllerTest extends WallabagCoreTestCase
             ->findOneByUsername('admin');
 
         $config = $user->getConfig();
-        $config->setRssToken('SUPERTOKEN');
-        $config->setRssLimit(1);
+        $config->setFeedToken('SUPERTOKEN');
+        $config->setFeedLimit(1);
         $em->persist($config);
         $em->flush();
 
@@ -177,8 +182,8 @@ class RssControllerTest extends WallabagCoreTestCase
             ->findOneByUsername('admin');
 
         $config = $user->getConfig();
-        $config->setRssToken('SUPERTOKEN');
-        $config->setRssLimit(null);
+        $config->setFeedToken('SUPERTOKEN');
+        $config->setFeedLimit(null);
         $em->persist($config);
         $em->flush();
 
@@ -187,7 +192,7 @@ class RssControllerTest extends WallabagCoreTestCase
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
 
-        $this->validateDom($client->getResponse()->getContent(), 'tag (foo bar)', 'tags/foo-bar');
+        $this->validateDom($client->getResponse()->getContent(), 'tag', 2, 'foo-bar');
 
         $client->request('GET', '/admin/SUPERTOKEN/tags/foo-bar.xml?page=3000');
         $this->assertSame(302, $client->getResponse()->getStatusCode());

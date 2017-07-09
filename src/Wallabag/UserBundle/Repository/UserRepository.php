@@ -7,18 +7,18 @@ use Doctrine\ORM\EntityRepository;
 class UserRepository extends EntityRepository
 {
     /**
-     * Find a user by its username and rss roken.
+     * Find a user by its username and Feed token.
      *
      * @param string $username
-     * @param string $rssToken
+     * @param string $feedToken
+     * @return null|User
      *
-     * @return User|null
      */
-    public function findOneByUsernameAndRsstoken($username, $rssToken)
+    public function findOneByUsernameAndFeedtoken($username, $feedToken)
     {
         return $this->createQueryBuilder('u')
             ->leftJoin('u.config', 'c')
-            ->where('c.rssToken = :rss_token')->setParameter('rss_token', $rssToken)
+            ->where('c.feedToken = :feed_token')->setParameter('feed_token', $feedToken)
             ->andWhere('u.username = :username')->setParameter('username', $username)
             ->getQuery()
             ->getOneOrNullResult();

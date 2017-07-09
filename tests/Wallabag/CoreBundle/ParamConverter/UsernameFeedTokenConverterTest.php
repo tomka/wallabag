@@ -4,15 +4,15 @@ namespace Tests\Wallabag\CoreBundle\Command;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Request;
-use Wallabag\CoreBundle\ParamConverter\UsernameRssTokenConverter;
+use Wallabag\CoreBundle\ParamConverter\UsernameFeedTokenConverter;
 use Wallabag\UserBundle\Entity\User;
 
-class UsernameRssTokenConverterTest extends \PHPUnit_Framework_TestCase
+class UsernameFeedTokenConverterTest extends \PHPUnit_Framework_TestCase
 {
     public function testSupportsWithNoRegistry()
     {
         $params = new ParamConverter([]);
-        $converter = new UsernameRssTokenConverter();
+        $converter = new UsernameFeedTokenConverter();
 
         $this->assertFalse($converter->supports($params));
     }
@@ -28,7 +28,7 @@ class UsernameRssTokenConverterTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([]));
 
         $params = new ParamConverter([]);
-        $converter = new UsernameRssTokenConverter($registry);
+        $converter = new UsernameFeedTokenConverter($registry);
 
         $this->assertFalse($converter->supports($params));
     }
@@ -44,7 +44,7 @@ class UsernameRssTokenConverterTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(['default' => null]));
 
         $params = new ParamConverter([]);
-        $converter = new UsernameRssTokenConverter($registry);
+        $converter = new UsernameFeedTokenConverter($registry);
 
         $this->assertFalse($converter->supports($params));
     }
@@ -82,7 +82,7 @@ class UsernameRssTokenConverterTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($em));
 
         $params = new ParamConverter(['class' => 'superclass']);
-        $converter = new UsernameRssTokenConverter($registry);
+        $converter = new UsernameFeedTokenConverter($registry);
 
         $this->assertFalse($converter->supports($params));
     }
@@ -120,7 +120,7 @@ class UsernameRssTokenConverterTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($em));
 
         $params = new ParamConverter(['class' => 'WallabagUserBundle:User']);
-        $converter = new UsernameRssTokenConverter($registry);
+        $converter = new UsernameFeedTokenConverter($registry);
 
         $this->assertTrue($converter->supports($params));
     }
@@ -128,7 +128,7 @@ class UsernameRssTokenConverterTest extends \PHPUnit_Framework_TestCase
     public function testApplyEmptyRequest()
     {
         $params = new ParamConverter([]);
-        $converter = new UsernameRssTokenConverter();
+        $converter = new UsernameFeedTokenConverter();
 
         $res = $converter->apply(new Request(), $params);
 
@@ -146,7 +146,7 @@ class UsernameRssTokenConverterTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $repo->expects($this->once())
-            ->method('findOneByUsernameAndRsstoken')
+            ->method('findOneByUsernameAndFeedToken')
             ->with('test', 'test')
             ->will($this->returnValue(null));
 
@@ -169,7 +169,7 @@ class UsernameRssTokenConverterTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($em));
 
         $params = new ParamConverter(['class' => 'WallabagUserBundle:User']);
-        $converter = new UsernameRssTokenConverter($registry);
+        $converter = new UsernameFeedTokenConverter($registry);
         $request = new Request([], [], ['username' => 'test', 'token' => 'test']);
 
         $converter->apply($request, $params);
@@ -184,7 +184,7 @@ class UsernameRssTokenConverterTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $repo->expects($this->once())
-            ->method('findOneByUsernameAndRsstoken')
+            ->method('findOneByUsernameAndFeedtoken')
             ->with('test', 'test')
             ->will($this->returnValue($user));
 
@@ -207,7 +207,7 @@ class UsernameRssTokenConverterTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($em));
 
         $params = new ParamConverter(['class' => 'WallabagUserBundle:User', 'name' => 'user']);
-        $converter = new UsernameRssTokenConverter($registry);
+        $converter = new UsernameFeedTokenConverter($registry);
         $request = new Request([], [], ['username' => 'test', 'token' => 'test']);
 
         $converter->apply($request, $params);
