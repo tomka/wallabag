@@ -23,11 +23,14 @@ class FeedControllerTest extends WallabagCoreTestCase
         $this->assertEquals(1, $xpath->query('/a:feed')->length);
 
         $this->assertEquals(1, $xpath->query('/a:feed/a:title')->length);
+        $this->assertContains('favicon.ico', $xpath->query('/a:feed/a:icon')->item(0)->nodeValue);
+        $this->assertContains('logo-square.png', $xpath->query('/a:feed/a:logo')->item(0)->nodeValue);
 
         $this->assertEquals(1, $xpath->query('/a:feed/a:updated')->length);
 
         $this->assertEquals(1, $xpath->query('/a:feed/a:generator')->length);
         $this->assertEquals('wallabag', $xpath->query('/a:feed/a:generator')->item(0)->nodeValue);
+        $this->assertEquals('admin', $xpath->query('/a:feed/a:author/a:name')->item(0)->nodeValue);
 
         $this->assertEquals(1, $xpath->query('/a:feed/a:subtitle')->length);
         if (null !== $tagValue && 0 === strpos($type, 'tag')) {
