@@ -11,8 +11,8 @@ class UserRepository extends EntityRepository
      *
      * @param string $username
      * @param string $feedToken
-     * @return null|User
      *
+     * @return null|User
      */
     public function findOneByUsernameAndFeedtoken($username, $feedToken)
     {

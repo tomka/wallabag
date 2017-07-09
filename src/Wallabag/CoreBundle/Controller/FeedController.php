@@ -193,7 +193,7 @@ class FeedController extends Controller
             $entries->setCurrentPage((int) $page);
         } catch (OutOfRangeCurrentPageException $e) {
             if ($page > 1) {
-                return $this->redirect($url.'/'.$entries->getNbPages());
+                return $this->redirect($url . '/' . $entries->getNbPages());
             }
         }
 
