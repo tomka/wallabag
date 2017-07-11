@@ -63,6 +63,7 @@ class ContentProxy
         // so we'll be able to refetch it in the future
         $content['url'] = !empty($content['url']) ? $content['url'] : $url;
 
+        $entry->setGivenUrl($url);
         $this->stockEntry($entry, $content);
     }
 
